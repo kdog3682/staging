@@ -2,16 +2,26 @@
 // export the entire file some how ...
 name: v-omni-input
 
+component :is = ckey :value = value @change = $emit('change', value)
 label {label}
-switch ctype
-    case 'Boolean'
-        v-checkbox :value = value @change = $emit('change', value)
-    case 'Number'
-        v-slider :value = value @change = $emit('change', value)
-            ref = slider
-    default
-        v-input2 :value = value @change = $emit('change', value)
 
+// it will naturally mesh down 
+// switch ctype
+    // case 'Boolean'
+        // v-checkbox :value = value @change = $emit('change', value)
+    // case 'Number'
+        // v-slider :value = value @change = $emit('change', value)
+            // ref = slider
+    // default
+        // v-input2 :value = value @change = $emit('change', value)
+
+computed ckey() {
+    switch (type(this.value)) {
+        case 'Boolean': return 'v-checkbox'
+        case 'Number': return 'v-slider'
+        default: return 'v-input2'
+    }
+}
 computed ctype() {
     return type(this.value)
 }
@@ -229,12 +239,15 @@ async function mounted() {
     await sleep(1000)
     console.log('mounted')
     const fzf = this.$refs.fzf
+    // you dont mutate from the bottom
+    // everything is top down 
+    // you want to change the slider ... you change it from the top
     // console.log(fzf.$refs)
     // console.log(fzf.$refs.omni[1].$refs.slider.increment())
     // const list = fzf.$refs.list
     // console.log("list", list)
     // console.log(list.$info('methods'))
-    console.log(fzf.$info('methods'))
+    // console.log(fzf.$info('methods'))
     // console.log(Object.keys(list.$options.methods))
     // console.log("list", list)
     return 
@@ -255,5 +268,10 @@ async function mounted() {
     fzf.$modularIndex('items')
     await sleep(1500)
     fzf.$modularIndex('items', -1)
+    // you have to premap the items
     // waterfall again
+    // prevent ...
+    enter()
+    es
+    // no highlights
 }

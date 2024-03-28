@@ -14,11 +14,21 @@ const handle = {
     
 }
 var ones = ['', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine'];
-
-
 const s = '    "$1": { "name": "$2", "type": "number" },'
+// clip(join(xmap('123456789', (x) => '    ' + templater(s, [x, ones[Number(x)]]))))
 
-
-clip(join(xmap('123456789', (x) => '    ' + templater(s, [x, ones[Number(x)]]))))
-
+// console.log(type(true))
+// console.log(strftime('datetime'))
     
+
+function blob(lang, content) {
+    const  ref = {
+        'html': 'text/html',
+        'css': 'text/css',
+        'javascript': 'application/javascript',
+    }
+    const type = ref[lang]
+    const blob = new Blob([content], {type})
+    const url = URL.createObjectURL(blob)
+    return url
+}

@@ -9,10 +9,8 @@ class ContextHandle {
         this.name = context.name
         const handle = context.handle || defaultHandle
         this.handle = handle.bind(this)
-        this.handlers = walk(
-            context.handlers,
-            (v) => v.bind(vue),
-        )
+        const bind = (x) => x ? x.bind(vue) : null
+        this.handlers = walk(context.handlers, bind)
 
         const keys = [
             "onStart",
@@ -21,8 +19,7 @@ class ContextHandle {
         ]
 
         for (const key of keys) {
-            const fn = c[key]
-            this[key] = fn ? fn.bind(this) : noop
+            this[key] = bind(c[key])
         }
     }
 }
@@ -208,11 +205,23 @@ const defaultContext = {
 }
 const fileContext = {
     name: 'files',
+    onStart() {
+        this.mode = 'files'
+        // everything is bound to vue ... this = vue
+    },
     handlers: {
+        escape() {
+            return {
+                newContext: 'directories'
+            }
+        },
         tab() {
-            // bound to vue
-            // this.fileRefKey = this.$modular('fileRefs')
             const fileInput = this.$refs.input
+            if (isActiveElement(fileInput)) {
+                fileInput.blur()
+            } else {
+                fileInput.focus()
+            }
         },
         up() {
             this.$modularIndex('files', -1)
@@ -253,3 +262,7 @@ const options = {
     }
 }
 const control = new HandleControl(vue, contexts, options)
+
+function isActiveElement(el) {
+
+}
