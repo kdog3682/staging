@@ -41,12 +41,18 @@ const ignorableLeafNodes = [
     "def",
     "pass",
     "finally",
+    "if",
+    "else",
+    "=>",
+    'arrow',
+    'Arrow',
 ]
 const attrLeafNodes = {
    'Star': 'generator',
    'const': 'constPrefix',
    'let': 'letPrefix',
-   'var': 'varPrefix',
-   'async': 'isAsync',
+   'var': 'letPrefix',
+   'async': 'asyncPrefix',
    'default': 'isDefault',
+   'extends': 'extends',
 }
