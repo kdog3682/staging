@@ -5,12 +5,24 @@ export {
 }
 class Visitor {
     constructor(config) {
-        const bind = (fn) => fn.bind(this)
+        const transformer = config.visitors.transform || config.transform
+        const transform = (x) => {
+            if (isFunction(x)) {
+                return x
+            }
+            if (transformer) {
+                return transformer(x)
+            }
+            panic('need to transform x into a function but config.transform is not provided')
+        }
+
+        const bind = (fn) => transform(fn).bind(this)
         this.visitors = dict(config.visitors, bind)
         this.entry = (ast) => ast[config.entry]
         this.visit = this.visit.bind(this)
         this.options = config.options || {}
         this.state = Object.assign({}, config.state)
+        this.wrapper = config.wrapper && config.wrapper.bind(this) || this.visitors.wrapper
     }
 
     visitAll(ast, ...args) {
@@ -34,11 +46,15 @@ class Visitor {
 
         if (fn) {
             try {
-                return fn(ast, ...args)
+                const value = fn(ast, ...args)
+                if (this.wrapper) {
+                    return this.wrapper(value, ast, ...args)
+                } else {
+                    return value
+                }
             } catch(e) {
-                console.log(e.stack)
                 pause(ast, 'ERROR', e.toString())
-                return 
+                throw e
             }
         }
     }
@@ -48,3 +64,6 @@ function visit(ast, options, ...args) {
     const visitor = new Visitor(options)
     return visitor.visit(ast, ...args)
 }
+
+
+

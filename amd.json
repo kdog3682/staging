@@ -1,0 +1,42 @@
+{
+  "name": "Script",
+  "children": [
+    {
+      "name": "ExpressionStatement",
+      "children": [
+        {
+          "name": "CallExpression",
+          "children": [
+            {
+              "name": "VariableName",
+              "value": "foo"
+            },
+            {
+              "name": "ArgList",
+              "children": [
+                {
+                  "name": "ArrowFunction",
+                  "children": [
+                    {
+                      "name": "ParamList",
+                      "children": [
+                        {
+                          "name": "VariableDefinition",
+                          "value": "x"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "VariableName",
+                      "value": "x"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

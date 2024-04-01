@@ -20,7 +20,8 @@ const NameCheckerVisitors = {
     ArrowFunction:  checker,
     Script(ast, env) {
         this.visitAll(ast, env)
-        return checkEnv(this, ast, env)
+        const stats = checkEnv(this, ast, env)
+        return stats
     },
     ImportDeclaration(ast, env) {
         const [a, b, c] = ast.children
@@ -32,13 +33,24 @@ const NameCheckerVisitors = {
                 imports,
                 type: 'group',
             })
-        } else {
+        } 
+
+        else if (c) {
             const file = c.value.slice(1, -1)
             const name = this.visit(b, env)
             this.state.imports.push({
                 file, 
                 imports: [name],
                 type: 'star',
+            })
+        }
+        else {
+            const file = b.value.slice(1, -1)
+            const name = this.visit(a, env)
+            this.state.imports.push({
+                file, 
+                imports: [name],
+                type: 'default',
             })
         }
         this.visitAll(ast, env)
@@ -84,14 +96,10 @@ function checkEnv(self, ast, rootEnv) {
     }
 
     const missing = new Set()
+    const touched = rootEnv.touched
     traverse(rootEnv, walker)
 
-    // const touched = rootEnv.touched
-    // const top = rootEnv.variables.keys()
-    // const ignorable = variables.javascriptNativeBindings
-    // const untouched = difference(top, touched, ignorable)
-
-    const untouchedStore = []
+    const untouchedStore = {}
     const importItems = self.state.imports
     const filter = (imp) => {
         return !touched.has(imp)
@@ -100,14 +108,13 @@ function checkEnv(self, ast, rootEnv) {
     for (const item of importItems) {
         const {imports, file, type} = item
         const untouched = imports.filter(filter)
+        deepAssign(untouchedStore, {[file]: {type, untouched}})
+        // console.log("untouched", untouched)
     }
-
-    // getting rid of the extraneous items
-    // adding in the missing items
 
     return {
         implied: Array.from(missing),
-        untouched,
+        untouched: untouchedStore,
     }
 }
 function collectImports(ast) {

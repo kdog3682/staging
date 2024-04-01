@@ -272,6 +272,4 @@ async function mounted() {
     // waterfall again
     // prevent ...
     enter()
-    es
-    // no highlights
 }
